@@ -1,0 +1,33 @@
+services:
+  # Backend API
+  - type: web
+    name: findit-api
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: MONGO_URI
+        scope: run
+        value: ${MONGO_URI}
+      - key: JWT_SECRET
+        scope: run
+        value: ${JWT_SECRET}
+      - key: JWT_EXPIRE
+        value: 30d
+      - key: CLOUDINARY_CLOUD_NAME
+        scope: run
+        value: ${CLOUDINARY_CLOUD_NAME}
+      - key: CLOUDINARY_API_KEY
+        scope: run
+        value: ${CLOUDINARY_API_KEY}
+      - key: CLOUDINARY_API_SECRET
+        scope: run
+        value: ${CLOUDINARY_API_SECRET}
+      - key: CLIENT_URL
+        value: https://findit-client.vercel.app
+      - key: NODE_ENV
+        value: production
+
+  # Frontend (built and deployed separately to Vercel)
+  # See vercel.json for frontend deployment config
