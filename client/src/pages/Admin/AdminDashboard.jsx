@@ -32,7 +32,6 @@ export default function AdminDashboard() {
   const [search, setSearch] = useState('');
   const [users, setUsers] = useState([]);
   const [, setUsersLoading] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
 
   const pendingItems = items.filter((i) => !i.verified);
   const allItems     = items;
@@ -67,38 +66,6 @@ export default function AdminDashboard() {
       fetchUsers();
     }
   }, [user, fetchUsers]);
-
-  const handleSeedDemoUsers = async () => {
-    try {
-      setDemoLoading(true);
-      const response = await api.post('/users/demo');
-      if (response.data.success) {
-        toast.success(`Created ${response.data.createdCount} demo users`);
-        fetchUsers();
-      }
-    } catch (err) {
-      console.error('Seed demo users failed:', err);
-      toast.error('Failed to seed demo users.');
-    } finally {
-      setDemoLoading(false);
-    }
-  };
-
-  const handleRemoveDemoUsers = async () => {
-    try {
-      setDemoLoading(true);
-      const response = await api.delete('/users/demo');
-      if (response.data.success) {
-        toast.success(`Removed ${response.data.deletedCount} demo users`);
-        fetchUsers();
-      }
-    } catch (err) {
-      console.error('Remove demo users failed:', err);
-      toast.error('Failed to remove demo users.');
-    } finally {
-      setDemoLoading(false);
-    }
-  };
 
   const handleDeleteUser = async (id) => {
     try {
@@ -142,22 +109,6 @@ export default function AdminDashboard() {
               <h1 className="text-2xl font-bold text-secondary dark:text-white">Admin Dashboard</h1>
               <p className="text-slate-500 dark:text-slate-400 text-sm">Manage reports, users, and campus safety</p>
             </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={handleSeedDemoUsers}
-              disabled={demoLoading}
-              className="btn-secondary px-4 py-2 text-sm"
-            >
-              Seed Demo Accounts
-            </button>
-            <button
-              onClick={handleRemoveDemoUsers}
-              disabled={demoLoading}
-              className="btn-danger px-4 py-2 text-sm"
-            >
-              Remove Demo Accounts
-            </button>
           </div>
         </div>
 

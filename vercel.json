@@ -1,8 +1,8 @@
 {
-  "buildCommand": "cd client && npm run build",
+  "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
   "env": {
-    "VITE_API_URL": "@vite_api_url_production"
+    "VITE_API_URL": "https://findit-zlro.onrender.com/api"
   },
   "rewrites": [
     {

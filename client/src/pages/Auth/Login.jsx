@@ -200,16 +200,7 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Google (UI only) */}
-          <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-            <span className="text-xs text-slate-400">or</span>
-            <div className="flex-1 h-px bg-slate-200 dark:bg-slate-700" />
-          </div>
-          <button className="w-full btn-secondary text-sm flex items-center justify-center gap-2">
-            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-4 h-4" />
-            Continue with Google
-          </button>
+
 
           <p className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6">
             Don't have an account?{' '}
