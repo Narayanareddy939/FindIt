@@ -79,13 +79,35 @@ app.use((err, _req, res, _next) => {
 /* ─── Demo data seeding ────────────────────────────────────────────────── */
 const seedDemoData = async () => {
   try {
+    // Always ensure admin user exists regardless of other data
+    const adminEmail = 'admin@findit.local';
+    const existingAdmin = await User.findOne({ email: adminEmail });
+    if (!existingAdmin) {
+      const bcrypt = require('bcryptjs');
+      const hashedPwd = await bcrypt.hash('Admin@123', 12);
+      await User.create({
+        name: 'Admin User',
+        email: adminEmail,
+        password: hashedPwd,
+        phone: '+91 98765 43210',
+        department: 'Administration',
+        year: '2026',
+        rollNo: 'ADMIN001',
+        role: 'admin',
+        isVerified: true,
+      });
+      console.log('✅ Admin user created');
+    } else {
+      console.log('ℹ️ Admin user already exists');
+    }
+
     const [userCount, itemCount, notificationCount] = await Promise.all([
       User.countDocuments(),
       Item.countDocuments(),
       Notification.countDocuments(),
     ]);
 
-    if (userCount > 0 || itemCount > 0 || notificationCount > 0) {
+    if (userCount > 1 || itemCount > 0 || notificationCount > 0) {
       console.log('ℹ️ Existing data detected; skipping demo seed');
       return;
     }
