@@ -71,12 +71,33 @@ router.post(
     const { email, password } = req.body;
 
     try {
-      const user = await User.findOne({ email }).select('+password');
-      if (!user || !(await user.comparePassword(password))) {
-        return res.status(401).json({ success: false, message: 'Invalid email or password.' });
-      }
+      const user = await User.findOne({ email }).select("+password");
 
-      sendToken(res, user);
+console.log("=================================");
+console.log("LOGIN ATTEMPT");
+console.log("Email:", email);
+console.log("User Found:", !!user);
+
+if (user) {
+  console.log("DB Email:", user.email);
+
+  const isMatch = await user.comparePassword(password);
+  console.log("Password Match:", isMatch);
+
+  if (!isMatch) {
+    return res.status(401).json({
+      success: false,
+      message: "Invalid email or password.",
+    });
+  }
+
+  sendToken(res, user);
+} else {
+  return res.status(401).json({
+    success: false,
+    message: "Invalid email or password.",
+  });
+}
     } catch (err) {
       res.status(500).json({ success: false, message: err.message });
     }
