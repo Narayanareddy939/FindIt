@@ -288,8 +288,8 @@ const fixDemoPasswords = async () => {
     if (!correctPwd) continue;
     const isMatch = await user.comparePassword(correctPwd).catch(() => false);
     if (!isMatch) {
-      user.password = await bcrypt.hash(correctPwd, 12);
-      await user.save({ validateBeforeSave: false });
+     user.password = correctPwd;
+await user.save({ validateBeforeSave: false });
       console.log(`🔑 Reset password for ${user.email}`);
     }
   }
