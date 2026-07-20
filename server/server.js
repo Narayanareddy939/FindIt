@@ -19,7 +19,18 @@ const Item = require('./models/Item');
 const Notification = require('./models/Notification');
 
 const app  = express();
-const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || '0.0.0.0';
+const DEFAULT_PORT = Number(process.env.PORT) || 5000;
+
+const tryListen = (port) => new Promise((resolve, reject) => {
+  const server = app.listen(port, HOST, () => {
+    resolve(server);
+  });
+
+  server.on('error', (err) => {
+    reject(err);
+  });
+});
 
 /* ─── Middleware ─────────────────────────────────────────────────────────── */
 const allowedOrigins = [
@@ -309,9 +320,28 @@ const startServer = async () => {
     await seedDemoData();
     await fixDemoPasswords();
 
-    app.listen(PORT, () => {
-      console.log(`🚀 FindIt API running on http://localhost:${PORT}`);
-    });
+    let portToUse = DEFAULT_PORT;
+    let server = null;
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        server = await tryListen(portToUse);
+        break;
+      } catch (err) {
+        if (err.code !== 'EADDRINUSE' || attempt === 4) {
+          throw err;
+        }
+
+        portToUse += 1;
+        console.warn(`⚠️ Port ${DEFAULT_PORT} is busy. Retrying on ${portToUse}...`);
+      }
+    }
+
+    if (!server) {
+      throw new Error('Unable to start server');
+    }
+
+    console.log(`🚀 FindIt API running on http://localhost:${portToUse}`);
 
     const shutdown = async () => {
       await mongoose.disconnect();
@@ -329,4 +359,8 @@ const startServer = async () => {
   }
 };
 
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = app;

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const Item = require('./models/Item');
 const Notification = require('./models/Notification');
-
+    // Clear existing data
 const DEMO_USERS = [
   {
     name: 'Admin User',

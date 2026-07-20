@@ -32,6 +32,7 @@
     "react-dropzone": "^15.0.0",
     "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.18.1",
+    "serverless-http": "^4.0.0",
     "tailwind-merge": "^3.6.0"
   }
 }
