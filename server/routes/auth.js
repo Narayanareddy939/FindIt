@@ -73,31 +73,14 @@ router.post(
     try {
       const user = await User.findOne({ email }).select("+password");
 
-console.log("=================================");
-console.log("LOGIN ATTEMPT");
-console.log("Email:", email);
-console.log("User Found:", !!user);
-
-if (user) {
-  console.log("DB Email:", user.email);
-
-  const isMatch = await user.comparePassword(password);
-  console.log("Password Match:", isMatch);
-
-  if (!isMatch) {
-    return res.status(401).json({
-      success: false,
-      message: "Invalid email or password.",
-    });
-  }
-
-  sendToken(res, user);
-} else {
+if (!user || !(await user.comparePassword(password))) {
   return res.status(401).json({
     success: false,
     message: "Invalid email or password.",
   });
 }
+
+sendToken(res, user);
     } catch (err) {
       res.status(500).json({ success: false, message: err.message });
     }
