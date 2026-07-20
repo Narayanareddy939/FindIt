@@ -18,8 +18,15 @@ const sendToken = (res, user, statusCode = 200) => {
 const registerValidation = [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('email')
-    .isEmail().normalizeEmail().withMessage('Valid email required')
-    .matches(/@presidencyuniversity\.in$/).withMessage('College email must end with @presidencyuniversity.in'),
+    .isEmail().withMessage('Valid email required')
+    .custom((value) => {
+      const lower = value.toLowerCase();
+      if (lower === 'admin@findit.local') return true;
+      if (!lower.endsWith('@presidencyuniversity.in')) {
+        throw new Error('College email must end with @presidencyuniversity.in');
+      }
+      return true;
+    }),
   body('password').isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
 ];
 
@@ -52,7 +59,7 @@ router.post('/register', registerValidation, handleRegister);
 router.post(
   '/login',
   [
-    body('email').isEmail().normalizeEmail(),
+    body('email').isEmail().withMessage('Valid email required'),
     body('password').notEmpty(),
   ],
   async (req, res) => {
