@@ -16,7 +16,9 @@ Complete step-by-step guide to deploy FindIt to production on Vercel, Render, an
 
 ## Phase 1: Set Up MongoDB Atlas (Database)
 
-### 1.1 Create MongoDB Atlas Cluster
+### 1.1 Optional: Create a New MongoDB Atlas Cluster
+
+If you already have an Atlas cluster and FindIt data, skip the new-cluster instructions below. Keep using the existing database, and set its private connection URI as `MONGO_URI` in Render. The database name in that URI must match the database containing your collections.
 
 1. Go to [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
 2. Sign up or log in
@@ -34,14 +36,9 @@ Complete step-by-step guide to deploy FindIt to production on Vercel, Render, an
    - Replace `<password>` with your actual password
    - Keep this for later ✅
 
-### 1.2 Seed Initial Data
+### 1.2 Preserve Existing Data
 
-You can seed demo data later after backend deployment, or do it locally before pushing:
-
-```bash
-# Local seeding (before deployment)
-npm run setup
-```
+Do not run `npm run seed` or `npm run setup` against your existing Atlas database. The demo seed utility deletes all users, items, and notifications before creating demo records. It now requires an explicit destructive opt-in and is only for disposable databases.
 
 ---
 
@@ -62,21 +59,7 @@ npm run setup
 
 ### 3.1 Prepare Backend
 
-1. Update `server/.env.production`:
-```bash
-PORT=5000
-NODE_ENV=production
-JWT_SECRET=GenerateVeryLongRandomSecret123!@#
-JWT_EXPIRE=30d
-CLIENT_URL=https://findit-client.vercel.app
-```
-
-2. Push to GitHub:
-```bash
-git add .
-git commit -m "Production ready: prepare for deployment"
-git push origin main
-```
+Set production environment variables in Render only. Do not create or commit a production `.env` file.
 
 ### 3.2 Deploy to Render
 
@@ -91,13 +74,13 @@ git push origin main
    - **Start Command:** `cd server && npm start`
    - **Plan:** Free (or choose paid)
 
-6. Add environment variables (click "Add Secret File"):
-   - `MONGO_URI`: Your MongoDB Atlas connection string
-   - `JWT_SECRET`: Your generated secret (min 32 chars)
+6. Add environment variables:
+   - `MONGO_URI`: The private Atlas URI for the database containing your existing data
+   - `JWT_SECRET`: A newly generated random secret (at least 32 characters)
    - `CLOUDINARY_CLOUD_NAME`: From Cloudinary
    - `CLOUDINARY_API_KEY`: From Cloudinary
    - `CLOUDINARY_API_SECRET`: From Cloudinary
-   - `CLIENT_URL`: `https://findit-client.vercel.app` (update after frontend deployed)
+   - `CLIENT_URL`: Your deployed Vercel frontend URL (update after frontend deployment)
 
 7. Click "Create Web Service" and wait for deployment ⏳
 
@@ -105,16 +88,7 @@ git push origin main
    - Format: `https://findit-api.onrender.com`
    - Add to Render environment: `API_URL`
 
-### 3.3 Seed Production Database
-
-Once backend is deployed, seed demo data:
-
-```bash
-# Locally with production MongoDB URI
-MONGO_URI=mongodb+srv://... npm run seed
-
-# Or use Render dashboard to run seeds
-```
+Do not seed the production database. The API now starts without inserting or modifying user, item, or notification records.
 
 ---
 
@@ -122,10 +96,7 @@ MONGO_URI=mongodb+srv://... npm run seed
 
 ### 4.1 Prepare Frontend
 
-1. Update `client/.env.production`:
-```bash
-VITE_API_URL=https://findit-api.onrender.com/api
-```
+1. Set `VITE_API_URL` in Vercel to your Render service URL followed by `/api` (for example, `https://findit-api.onrender.com/api`).
 
 2. Push to GitHub:
 ```bash
@@ -140,21 +111,15 @@ git push origin main
 2. Sign up with GitHub
 3. Click "Import Project"
 4. Select FindIt repository
-5. Configure:
-   - **Project Name:** `findit-client`
-   - **Framework:** `Vite`
-   - **Root Directory:** `client`
-   - **Build Command:** `npm run build`
-   - **Output Directory:** `dist`
+5. Keep the **Root Directory** at the repository root. The root `vercel.json` builds `client` and publishes `client/dist`.
 
 6. Add Environment Variables:
-   - `VITE_API_URL`: `https://findit-api.onrender.com/api`
+   - `VITE_API_URL`: Your Render service URL followed by `/api`
 
 7. Click "Deploy" and wait ⏳
 
 8. Once deployed, copy your frontend URL:
-   - Format: `https://findit-client.vercel.app`
-   - Update Render `CLIENT_URL` to this URL
+   - Use the assigned deployment URL and set it as Render's `CLIENT_URL`
 
 ---
 
@@ -165,7 +130,7 @@ git push origin main
 1. Go to Render dashboard
 2. Select `findit-api` service
 3. Click "Environment"
-4. Update `CLIENT_URL` to your Vercel URL: `https://findit-client.vercel.app`
+4. Update `CLIENT_URL` to your exact Vercel deployment URL
 5. Service automatically redeploys ✅
 
 ---
@@ -174,10 +139,8 @@ git push origin main
 
 ### 6.1 Verify Deployment
 
-1. Open frontend: [https://findit-client.vercel.app](https://findit-client.vercel.app)
-2. Test login with demo account:
-   - Email: `admin@findit.local`
-   - Password: `Admin@123`
+1. Open your Vercel deployment URL.
+2. Test login with an existing user account from your Atlas database.
 3. Verify:
    - ✅ Login works
    - ✅ Dashboard loads

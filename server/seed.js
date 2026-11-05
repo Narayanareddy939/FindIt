@@ -3,7 +3,12 @@ const mongoose = require('mongoose');
 const User = require('./models/User');
 const Item = require('./models/Item');
 const Notification = require('./models/Notification');
-    // Clear existing data
+
+if (process.env.ALLOW_DESTRUCTIVE_SEED !== 'true') {
+  console.error('Refusing to run the destructive demo seed. Set ALLOW_DESTRUCTIVE_SEED=true only for a disposable database.');
+  process.exit(1);
+}
+
 const DEMO_USERS = [
   {
     name: 'Admin User',

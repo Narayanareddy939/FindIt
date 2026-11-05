@@ -2,14 +2,14 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
-dotenv.config({ path: path.resolve(__dirname, '.env.development') });
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: path.resolve(__dirname, '.env.development') });
+}
 
 const express    = require('express');
 const cors       = require('cors');
 const morgan     = require('morgan');
 const mongoose   = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
 const authRoutes  = require('./routes/auth');
 const itemRoutes  = require('./routes/items');
 const userRoutes  = require('./routes/users');
@@ -298,6 +298,10 @@ await user.save({ validateBeforeSave: false });
 /* ─── Database + Server ──────────────────────────────────────────────────── */
 const startServer = async () => {
   try {
+    if (process.env.NODE_ENV === 'production' && !process.env.MONGO_URI) {
+      throw new Error('MONGO_URI must be configured in production');
+    }
+
     let mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/findit';
     let memoryServer = null;
 
@@ -307,7 +311,8 @@ const startServer = async () => {
       });
       console.log('✅ MongoDB connected');
     } catch (connectErr) {
-      if (!process.env.MONGO_URI || /localhost|127\.0\.0\.1/.test(mongoUri)) {
+      if (process.env.NODE_ENV !== 'production' && (!process.env.MONGO_URI || /localhost|127\.0\.0\.1/.test(mongoUri))) {
+        const { MongoMemoryServer } = require('mongodb-memory-server');
         memoryServer = await MongoMemoryServer.create();
         mongoUri = memoryServer.getUri();
         await mongoose.connect(mongoUri);
@@ -316,9 +321,6 @@ const startServer = async () => {
         throw connectErr;
       }
     }
-
-    await seedDemoData();
-    await fixDemoPasswords();
 
     let portToUse = DEFAULT_PORT;
     let server = null;
