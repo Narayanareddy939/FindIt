@@ -4,22 +4,51 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, AlertCircle, CheckCircle2, ArrowRight, Zap,
   Users, Package, TrendingUp, Star, ChevronDown,
-  Shield, Clock,
+  Shield, Clock, FileEdit, Bot, Bell, Handshake, Sparkles, Tag,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../../components/common/PageWrapper';
 import ItemCard from '../../components/cards/ItemCard';
 import StatCard from '../../components/cards/StatCard';
+import CategoryIcon from '../../components/common/CategoryIcon';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
-import { mockStats, mockTestimonials, mockFAQs, mockItems } from '../../data/mockData';
+import { mockStats, mockTestimonials, mockFAQs, mockItems, CATEGORIES } from '../../data/mockData';
 
 /* ─── How It Works steps ─────────────────────────────────────────────────── */
 const HOW_STEPS = [
-  { icon: '📝', step: '01', title: 'Report Your Item', desc: 'Fill a quick form with item details, photos, and location. AI enhances your description automatically.' },
-  { icon: '🤖', step: '02', title: 'AI Finds Matches', desc: 'Our smart engine scans all reports and calculates similarity scores between lost and found items.' },
-  { icon: '🔔', step: '03', title: 'Get Notified Instantly', desc: 'When a match above 70% is found, both parties receive an instant notification with match details.' },
-  { icon: '🤝', step: '04', title: 'Connect & Recover', desc: 'Contact the finder securely through FindIt. Verify, collect your item, and mark it as returned.' },
+  {
+    icon: FileEdit,
+    step: '01',
+    title: 'Report Your Item',
+    desc: 'Fill a quick form with item details, photos, and location. AI enhances your description automatically.',
+    color: 'from-blue-500 to-indigo-600',
+    shadow: 'shadow-blue-500/20',
+  },
+  {
+    icon: Bot,
+    step: '02',
+    title: 'AI Finds Matches',
+    desc: 'Our smart engine scans all reports and calculates similarity scores between lost and found items.',
+    color: 'from-purple-500 to-violet-600',
+    shadow: 'shadow-purple-500/20',
+  },
+  {
+    icon: Bell,
+    step: '03',
+    title: 'Get Notified Instantly',
+    desc: 'When a match above 70% is found, both parties receive an instant notification with match details.',
+    color: 'from-amber-500 to-orange-600',
+    shadow: 'shadow-amber-500/20',
+  },
+  {
+    icon: Handshake,
+    step: '04',
+    title: 'Connect & Recover',
+    desc: 'Contact the finder securely through FindIt. Verify, collect your item, and mark it as returned.',
+    color: 'from-emerald-500 to-teal-600',
+    shadow: 'shadow-emerald-500/20',
+  },
 ];
 
 /* ─── FAQ Item ───────────────────────────────────────────────────────────── */
@@ -234,22 +263,59 @@ export default function Home() {
             {/* Connector line */}
             <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-primary-200 via-violet-200 to-primary-200 dark:from-primary-900 dark:via-violet-900 dark:to-primary-900 z-0" />
 
-            {HOW_STEPS.map((step, i) => (
-              <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.15 }}
-                className="glass-card p-6 text-center relative z-10"
+            {HOW_STEPS.map((step, i) => {
+              const StepIcon = step.icon;
+              return (
+                <motion.div
+                  key={step.step}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15 }}
+                  className="glass-card p-6 text-center relative z-10 hover:-translate-y-1 transition-transform duration-300"
+                >
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-tr ${step.color} ${step.shadow} shadow-lg flex items-center justify-center text-white mx-auto mb-4`}>
+                    <StepIcon size={24} />
+                  </div>
+                  <div className="w-7 h-7 bg-slate-900/10 dark:bg-white/10 text-primary-600 dark:text-primary-300 text-xs font-bold rounded-full flex items-center justify-center mx-auto mb-3 border border-primary-500/20">
+                    {step.step}
+                  </div>
+                  <h3 className="font-bold text-secondary dark:text-white mb-2 text-sm">{step.title}</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{step.desc}</p>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Browse by Category ────────────────────────────────────────────── */}
+      <section className="section bg-white dark:bg-slate-900/40 py-12 border-b border-slate-100 dark:border-slate-800">
+        <div className="container-app">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-3">
+            <div>
+              <span className="text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider">Quick Navigation</span>
+              <h2 className="text-2xl font-bold text-secondary dark:text-white mt-1">Browse by Category</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">Explore reported campus items by category</p>
+            </div>
+            <Link to="/search" className="btn-ghost text-sm flex items-center gap-1 self-start sm:self-auto">
+              All Categories <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+            {CATEGORIES.map((cat) => (
+              <Link
+                key={cat.id}
+                to={`/search?category=${cat.id}`}
+                className="card card-hover p-4 flex flex-col items-center text-center gap-2.5 group transition-all"
               >
-                <div className="text-3xl mb-3">{step.icon}</div>
-                <div className="w-8 h-8 bg-primary-600 text-white text-xs font-bold rounded-full flex items-center justify-center mx-auto mb-3">
-                  {step.step}
+                <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-primary-600 dark:text-primary-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary-600 group-hover:text-white transition-all shadow-sm">
+                  <CategoryIcon categoryId={cat.id} size={22} />
                 </div>
-                <h3 className="font-bold text-secondary dark:text-white mb-2 text-sm">{step.title}</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{step.desc}</p>
-              </motion.div>
+                <span className="text-xs font-semibold text-secondary dark:text-slate-200 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors truncate w-full">
+                  {cat.label}
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -319,19 +385,24 @@ export default function Home() {
               </div>
               <div className="space-y-3">
                 {[
-                  { icon: '✍️', label: 'Description Enhancement', desc: '"Blue wallet" → AI rewrites with full detail' },
-                  { icon: '🏷️', label: 'Auto Category Detection', desc: '"AirPods" → Electronics selected automatically' },
-                  { icon: '🔍', label: 'Keyword Extraction', desc: 'Color, brand, type, location extracted instantly' },
-                  { icon: '🎯', label: 'Smart Match Score', desc: '97% match → Instant notification to owner' },
-                ].map((f) => (
-                  <div key={f.label} className="flex items-start gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-3.5 border border-white/10">
-                    <span className="text-2xl">{f.icon}</span>
-                    <div>
-                      <p className="font-semibold text-sm">{f.label}</p>
-                      <p className="text-xs text-slate-300 mt-0.5">{f.desc}</p>
+                  { icon: Sparkles, color: 'text-cyan-300 bg-cyan-400/20', label: 'Description Enhancement', desc: '"Blue wallet" → AI rewrites with full detail' },
+                  { icon: Tag, color: 'text-amber-300 bg-amber-400/20', label: 'Auto Category Detection', desc: '"AirPods" → Earphones selected automatically' },
+                  { icon: Search, color: 'text-emerald-300 bg-emerald-400/20', label: 'Keyword Extraction', desc: 'Color, brand, type, location extracted instantly' },
+                  { icon: Zap, color: 'text-rose-300 bg-rose-400/20', label: 'Smart Match Score', desc: '97% match → Instant notification to owner' },
+                ].map((f) => {
+                  const FeatureIcon = f.icon;
+                  return (
+                    <div key={f.label} className="flex items-start gap-3.5 bg-white/10 backdrop-blur-sm rounded-xl p-3.5 border border-white/10 hover:bg-white/15 transition-colors">
+                      <div className={`p-2 rounded-lg shrink-0 ${f.color}`}>
+                        <FeatureIcon size={18} />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-sm text-white">{f.label}</p>
+                        <p className="text-xs text-slate-300 mt-0.5">{f.desc}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>

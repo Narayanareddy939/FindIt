@@ -9,6 +9,7 @@ import {
 import PageWrapper from '../../components/common/PageWrapper';
 import { useApp } from '../../context/AppContext';
 import { CATEGORIES, CAMPUS_LOCATIONS } from '../../data/mockData';
+import CategoryIcon from '../../components/common/CategoryIcon';
 import { detectCategory, enhanceDescription, extractKeywords } from '../../utils/aiHelpers';
 import toast from 'react-hot-toast';
 
@@ -177,17 +178,24 @@ export default function ReportFound() {
                   <label className="block text-sm font-medium text-secondary dark:text-slate-200 mb-1.5">
                     Category <span className="text-danger">*</span>
                   </label>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
                     {CATEGORIES.map((cat) => (
-                      <button key={cat.id} type="button"
+                      <button
+                        key={cat.id}
+                        type="button"
                         onClick={() => setForm((f) => ({ ...f, category: cat.id }))}
-                        className={`flex flex-col items-center gap-1 p-2.5 rounded-xl border-2 text-xs font-medium transition-all ${
+                        className={`flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 text-xs font-medium transition-all ${
                           form.category === cat.id
-                            ? 'border-success bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                            : 'border-slate-200 dark:border-slate-700 hover:border-green-300 text-slate-600 dark:text-slate-300'
-                        }`}>
-                        <span className="text-lg">{cat.icon}</span>
-                        <span>{cat.label}</span>
+                            ? 'border-success bg-green-50 dark:bg-green-900/25 text-green-700 dark:text-green-300 shadow-sm ring-1 ring-green-500/20'
+                            : 'border-slate-200 dark:border-slate-700 hover:border-green-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300'
+                        }`}
+                      >
+                        <CategoryIcon
+                          categoryId={cat.id}
+                          size={22}
+                          className={form.category === cat.id ? 'text-success' : 'text-slate-500 dark:text-slate-400'}
+                        />
+                        <span className="truncate w-full">{cat.label}</span>
                       </button>
                     ))}
                   </div>

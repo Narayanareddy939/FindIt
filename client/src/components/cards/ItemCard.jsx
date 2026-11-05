@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { MapPin, Calendar, Eye, Bookmark, BookmarkCheck, Award, CheckCircle, Zap } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { CATEGORIES } from '../../data/mockData';
+import CategoryIcon from '../common/CategoryIcon';
 import { formatDate, timeAgo, truncate, statusBadgeClass, statusLabel, matchMeta } from '../../utils/helpers';
 
 /**
@@ -44,29 +45,38 @@ export default function ItemCard({ item, index = 0 }) {
       )}
 
       {/* Image */}
-      <Link to={`/item/${item.id}`} className="block relative overflow-hidden aspect-[4/3] rounded-t-2xl bg-slate-100 dark:bg-slate-700">
+      <Link to={`/item/${item.id}`} className="block relative overflow-hidden aspect-[4/3] rounded-t-2xl bg-slate-100 dark:bg-slate-800">
         {item.images?.[0] ? (
           <img
             src={item.images[0]}
             alt={item.title}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+              if (e.currentTarget.nextElementSibling) {
+                e.currentTarget.nextElementSibling.classList.remove('hidden');
+              }
+            }}
           />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl">
-            {cat?.icon || '📦'}
+        ) : null}
+        <div className={`w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/80 dark:to-slate-900 ${item.images?.[0] ? 'hidden' : ''}`}>
+          <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform">
+            <CategoryIcon categoryId={item.category} size={26} />
           </div>
-        )}
+          <span className="text-[11px] font-semibold text-slate-400 tracking-wider uppercase">{cat?.label || item.category}</span>
+        </div>
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </Link>
 
       {/* Content */}
       <div className="p-4">
         {/* Category + Status row */}
         <div className="flex items-center justify-between mb-2">
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${cat?.color || 'bg-slate-100 text-slate-600'}`}>
-            {cat?.icon} {cat?.label || item.category}
+          <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ${cat?.color || 'bg-slate-100 text-slate-600'}`}>
+            <CategoryIcon categoryId={item.category} size={12} className="shrink-0" />
+            <span>{cat?.label || item.category}</span>
           </span>
           <span className={statusBadgeClass(item.status)}>
             {statusLabel(item.status)}

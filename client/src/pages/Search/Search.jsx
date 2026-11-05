@@ -8,6 +8,7 @@ import PageWrapper from '../../components/common/PageWrapper';
 import ItemCard from '../../components/cards/ItemCard';
 import { useApp } from '../../context/AppContext';
 import { CATEGORIES } from '../../data/mockData';
+import CategoryIcon from '../../components/common/CategoryIcon';
 import { debounce } from '../../utils/helpers';
 
 const SORT_OPTIONS = [
@@ -241,7 +242,10 @@ export default function Search() {
                   : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-primary-400'
               }`}
             >
-              {cat.icon} {cat.label}
+              <span className="inline-flex items-center gap-1.5">
+                <CategoryIcon categoryId={cat.id} size={14} className="shrink-0" />
+                <span>{cat.label}</span>
+              </span>
             </button>
           ))}
         </div>

@@ -11,6 +11,7 @@ import ItemCard from '../../components/cards/ItemCard';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { CATEGORIES } from '../../data/mockData';
+import CategoryIcon from '../../components/common/CategoryIcon';
 import { findMatches } from '../../utils/aiHelpers';
 import { formatDate, timeAgo, statusBadgeClass, statusLabel, avatarColor, getInitials, copyToClipboard, waShareUrl, shareUrl } from '../../utils/helpers';
 import toast from 'react-hot-toast';
@@ -163,7 +164,12 @@ export default function ItemDetails() {
                   />
                 </AnimatePresence>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-7xl">{cat?.icon || '📦'}</div>
+                <div className="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 p-8 text-center">
+                  <div className="w-20 h-20 rounded-3xl bg-white dark:bg-slate-800 shadow-md border border-slate-200/60 dark:border-slate-700 flex items-center justify-center text-primary-600 dark:text-primary-400">
+                    <CategoryIcon categoryId={item.category} size={40} />
+                  </div>
+                  <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{cat?.label || item.category}</span>
+                </div>
               )}
 
               {/* Image nav */}
@@ -240,8 +246,9 @@ export default function ItemDetails() {
             <div>
               <div className="flex items-start justify-between gap-4 mb-2">
                 <h1 className="text-2xl font-bold text-secondary dark:text-white leading-tight">{item.title}</h1>
-                <span className={`shrink-0 text-xs font-medium px-2.5 py-1 rounded-full ${cat?.color}`}>
-                  {cat?.icon} {cat?.label}
+                <span className={`shrink-0 inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full ${cat?.color}`}>
+                  <CategoryIcon categoryId={item.category} size={14} className="shrink-0" />
+                  <span>{cat?.label || item.category}</span>
                 </span>
               </div>
               <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 dark:text-slate-400">

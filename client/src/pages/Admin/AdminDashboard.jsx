@@ -8,6 +8,7 @@ import PageWrapper from '../../components/common/PageWrapper';
 import { useApp } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { CATEGORIES } from '../../data/mockData';
+import CategoryIcon from '../../components/common/CategoryIcon';
 import { formatDate, timeAgo, statusBadgeClass, statusLabel } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
@@ -173,14 +174,13 @@ export default function AdminDashboard() {
               </div>
             ) : (
               filtered(pendingItems).map((item) => {
-                const cat = CATEGORIES.find((c) => c.id === item.category);
                 return (
                   <motion.div key={item.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                     className="card p-4 flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0">
+                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-700 shrink-0 flex items-center justify-center">
                       {item.images?.[0]
                         ? <img src={item.images[0]} alt="" className="w-full h-full object-cover" />
-                        : <div className="w-full h-full flex items-center justify-center text-2xl">{cat?.icon}</div>
+                        : <CategoryIcon categoryId={item.category} size={22} className="text-primary-600 dark:text-primary-400" />
                       }
                     </div>
                     <div className="flex-1 min-w-0">
@@ -225,7 +225,12 @@ export default function AdminDashboard() {
                   return (
                     <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
                       <td className="px-4 py-3 font-medium text-secondary dark:text-white max-w-[160px] truncate">{item.title}</td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{cat?.icon} {cat?.label}</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                        <span className="inline-flex items-center gap-1.5">
+                          <CategoryIcon categoryId={item.category} size={14} className="shrink-0 text-slate-400" />
+                          <span>{cat?.label || item.category}</span>
+                        </span>
+                      </td>
                       <td className="px-4 py-3"><span className={statusBadgeClass(item.status)}>{statusLabel(item.status)}</span></td>
                       <td className="px-4 py-3 text-slate-500 dark:text-slate-400 max-w-[120px] truncate">{item.reporter?.name}</td>
                       <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{formatDate(item.date)}</td>
