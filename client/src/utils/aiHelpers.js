@@ -33,8 +33,42 @@ const templates = {
 };
 
 export const enhanceDescription = async (rawText, category) => {
-  // Simulate API delay
-  await new Promise((r) => setTimeout(r, 1800));
+  const apiKey = import.meta.env?.VITE_GEMINI_API_KEY;
+  if (apiKey) {
+    try {
+      const prompt = `You are an AI assistant for FindIt, a campus lost and found platform at Presidency University.
+Professionally enhance the following description for a reported lost or found ${category || 'item'}.
+Make it clear, descriptive, and helpful for identifying the item (2-3 sentences), mentioning possible identifying marks, condition, and details.
+User description: "${rawText.trim()}"
+Enhanced description:`;
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 200,
+            },
+          }),
+        }
+      );
+
+      if (res.ok) {
+        const data = await res.json();
+        const generated = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+        if (generated) return generated;
+      }
+    } catch {
+      // Continue to template fallback if API fails
+    }
+  }
+
+  // Fallback to template if Gemini API key is missing or request fails
+  await new Promise((r) => setTimeout(r, 600));
   const fn = templates[category] || templates.default;
   return fn(rawText.trim());
 };

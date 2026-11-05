@@ -4,13 +4,14 @@ Get FindIt running locally in 5 minutes!
 
 ---
 
-## 🚀 One-Command Setup (Recommended)
+## 🚀 Local Setup
 
 ```bash
-npm run setup
+npm run install:all
 ```
 
-This installs all dependencies and seeds demo data. Then skip to step 3 below.
+This installs root, frontend, and backend dependencies. It does not seed or
+modify your database.
 
 ---
 
@@ -30,37 +31,34 @@ cd ../server && npm install
 
 ### Step 2: Configure Environment
 
-**Create `server/.env` file:**
+From the `server` folder, run this PowerShell script:
 
-```bash
-PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/findit
-JWT_SECRET=your_super_secret_jwt_key_change_this_in_production
-JWT_EXPIRE=30d
-CLIENT_URL=http://localhost:5173
-CLOUDINARY_CLOUD_NAME=optional_for_image_uploads
-CLOUDINARY_API_KEY=optional
-CLOUDINARY_API_SECRET=optional
+```powershell
+.\setup-local-env.ps1
 ```
 
-**Create `client/.env.development` file:**
+It securely prompts for the rotated Atlas database password, URL-encodes it,
+targets the existing `findit` database, generates a random JWT secret, and
+writes `server/.env` without displaying credential values. It can also prompt
+for rotated Cloudinary credentials if image uploads are needed. Do not enter
+Gemini or Google OAuth settings; this application does not currently use them.
+If you have an existing `.env` to replace, run `.\setup-local-env.ps1 -Force`.
+Never commit `server/.env` or send its contents in chat. If Atlas refuses the
+connection, allow your laptop's IP in Atlas Network Access. The backend does
+not use local or in-memory MongoDB.
 
-```bash
+Copy `client/.env.development.example` to `client/.env.development`. Its local
+API setting should be:
+
+```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-### Step 3: Seed Demo Data
+Cloudinary is optional for other features. To enable image uploads, set
+`CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, and `CLOUDINARY_API_SECRET` in
+`server/.env`.
 
-```bash
-npm run seed
-```
-
-**Demo Accounts Created:**
-- Admin: `admin@findit.local` / `Admin@123`
-- Student: `student@presidencyuniversity.in` / `Student@123`
-
-### Step 4: Start Development Servers
+### Step 3: Start Development Servers
 
 **Option A: Run Both Servers (Recommended)**
 ```bash
@@ -79,27 +77,21 @@ Terminal 2 — Frontend:
 npm run dev:client
 ```
 
-### Step 5: Open in Browser
+### Step 4: Open in Browser
 
 ```
 http://localhost:5173
 ```
 
-Click "Sign In" → "Try Demo Account" → Explore! 🎉
+Create an account using an `@presidencyuniversity.in` address, or sign in with
+an account that already exists in your Atlas database. Setup does not create
+demo users or items.
 
 ---
 
-## 🔒 Demo Account Features
-
-### Admin Account
-- Email: `admin@findit.local`
-- Password: `Admin@123`
-- Access: Admin Dashboard, approve items, view users
-
-### Student Account
-- Email: `student@presidencyuniversity.in`
-- Password: `Student@123`
-- Access: Full student features, report items, search, bookmarks
+No demo users or sample records are created by setup. Existing Atlas data is
+left untouched; an admin dashboard requires an existing account with the
+`admin` role.
 
 ---
 
@@ -109,7 +101,7 @@ After starting servers, check:
 
 1. **Frontend loads:** [http://localhost:5173](http://localhost:5173)
 2. **Backend health:** [http://localhost:5000/api/health](http://localhost:5000/api/health)
-3. **Can login:** Use demo credentials above
+3. **Can login:** Use an account that already exists in Atlas
 4. **Dashboard appears:** After login, should see stats and notifications
 5. **Search works:** Browse Items shows items from database
 
@@ -127,13 +119,10 @@ npm run dev:server
 # Run just frontend
 npm run dev:client
 
-# Seed database
-npm run seed
-
 # Build for production
 npm run build
 
-# Full setup from scratch
+# Install all dependencies; no database seed runs
 npm run setup
 ```
 
@@ -141,28 +130,15 @@ npm run setup
 
 ## 🗄️ Database (MongoDB)
 
-### Option 1: Local MongoDB (Recommended for development)
+### Existing MongoDB Atlas Cluster
 
-```bash
-# macOS (with Homebrew)
-brew services start mongodb-community
+Do not install or start local MongoDB; the backend requires the Atlas URI.
 
-# Windows (with Chocolatey)
-choco install mongodb-community
-
-# Linux (Ubuntu/Debian)
-sudo systemctl start mongod
-
-# Verify running
-mongo --version
-```
-
-### Option 2: MongoDB Atlas (Cloud)
+### Atlas connection details
 
 1. Go to [mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas)
-2. Create free cluster
-3. Get connection string
-4. Update `MONGO_URI` in `.env`
+2. Select your existing cluster and get its connection string.
+3. Store the connection string in `server/.env` as `MONGO_URI`.
 
 ---
 
@@ -193,24 +169,14 @@ Without Cloudinary, image uploads will fail (but other features work).
 PORT=5001  # or any free port
 ```
 
-### MongoDB Connection Error
+### MongoDB Atlas Connection Error
 
-```bash
-# Make sure MongoDB is running
-mongod
-
-# Or use MongoDB Atlas connection string
-MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/findit
-```
+Check `MONGO_URI` in `server/.env` and confirm Atlas Network Access allows this
+laptop.
 
 ### Dependencies Install Failed
 
-```bash
-# Clear cache and try again
-rm -rf node_modules package-lock.json
-npm cache clean --force
-npm install
-```
+From the project folder, run `npm run install:all` without deleting lockfiles.
 
 ### "Cannot find module" errors
 
@@ -262,13 +228,10 @@ FindIt/
 
 ## 🎯 Next Steps
 
-1. ✅ Explore the app with demo accounts
-2. ✅ Try reporting a lost/found item
-3. ✅ Search and filter items
-4. ✅ Test bookmarks
-5. ✅ Check admin dashboard
-6. ✅ Read PRODUCTION_README.md for deployment
-7. ✅ Read DEPLOYMENT_GUIDE.md to go live
+1. Register or sign in with an account in your Atlas database.
+2. Test lost/found reporting, search, bookmarks, and notifications.
+3. Check the admin dashboard with an existing admin account.
+4. Review the deployment guides only after local verification.
 
 ---
 

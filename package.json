@@ -10,7 +10,7 @@
     "install:all": "npm install && cd client && npm install && cd ../server && npm install",
     "build": "cd client && npm run build",
     "seed": "cd server && npm run seed",
-    "setup": "npm run install:all && npm run seed"
+    "setup": "npm run install:all"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

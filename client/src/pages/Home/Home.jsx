@@ -65,7 +65,7 @@ function FAQItem({ q, a, index }) {
 /* ─── Home Page ──────────────────────────────────────────────────────────── */
 export default function Home() {
   const navigate      = useNavigate();
-  const { items, loading }     = useApp();
+  const { items }     = useApp();
   const { user }      = useAuth();
   const [query, setQuery] = useState('');
 

@@ -6,20 +6,33 @@ import { useAuth } from '../../context/AuthContext';
 import { isValidEmail, isValidPhone } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 
-const Field = ({ label, name, type = 'text', icon: Icon, placeholder, form, handleChange, errors, ...rest }) => (
+const Field = ({
+  label, name, type = 'text', icon: Icon, placeholder, form, handleChange, errors,
+  showPassword, onTogglePassword, ...rest
+}) => (
   <div>
     <label className="block text-sm font-medium text-secondary dark:text-slate-200 mb-1.5">{label}</label>
     <div className="relative">
       {Icon && <Icon size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />}
       <input
         name={name}
-        type={type}
+        type={type === 'password' && showPassword ? 'text' : type}
         value={form[name]}
         onChange={handleChange}
         placeholder={placeholder}
-        className={`input-base ${Icon ? 'pl-10' : ''} ${errors[name] ? 'input-error' : ''}`}
+        className={`input-base ${Icon ? 'pl-10' : ''} ${type === 'password' ? 'pr-10' : ''} ${errors[name] ? 'input-error' : ''}`}
         {...rest}
       />
+      {type === 'password' && (
+        <button
+          type="button"
+          onClick={onTogglePassword}
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+        >
+          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+        </button>
+      )}
     </div>
     {errors[name] && <p className="text-xs text-danger mt-1 flex items-center gap-1"><AlertCircle size={11} />{errors[name]}</p>}
   </div>
@@ -202,10 +215,10 @@ export default function Signup() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 sm:col-span-1">
-                <Field label="Password" name="password" type="password" icon={Lock} placeholder="••••••••" autoComplete="new-password" form={form} handleChange={handleChange} errors={errors} />
+                <Field label="Password" name="password" type="password" icon={Lock} placeholder="••••••••" autoComplete="new-password" form={form} handleChange={handleChange} errors={errors} showPassword={showPw} onTogglePassword={() => setShowPw((visible) => !visible)} />
               </div>
               <div className="col-span-2 sm:col-span-1">
-                <Field label="Confirm Password" name="confirm" type="password" icon={Lock} placeholder="••••••••" autoComplete="new-password" form={form} handleChange={handleChange} errors={errors} />
+                <Field label="Confirm Password" name="confirm" type="password" icon={Lock} placeholder="••••••••" autoComplete="new-password" form={form} handleChange={handleChange} errors={errors} showPassword={showPw} onTogglePassword={() => setShowPw((visible) => !visible)} />
               </div>
             </div>
 

@@ -7,16 +7,13 @@ Fast lookup guide for common tasks.
 ## 🚀 Quick Commands
 
 ```bash
-# Setup (one time)
-npm run setup              # Install dependencies + seed database
+# Setup (one time; installs dependencies only)
+npm run setup
 
 # Development
 npm run dev               # Start frontend + backend
 npm run dev:client        # Start React only
 npm run dev:server        # Start Express only
-
-# Database
-npm run seed              # Seed with demo accounts
 
 # Build
 npm run build             # Build React for production
@@ -42,17 +39,8 @@ curl http://localhost:5000/api/health
 
 ---
 
-## 🔐 Demo Accounts
-
-```
-Admin:
-  Email: admin@findit.local
-  Password: Admin@123
-
-Student:
-  Email: student@presidencyuniversity.in
-  Password: Student@123
-```
+Setup does not create demo accounts or records. Use an account that already
+exists in Atlas, or register a new account.
 
 ---
 
@@ -101,13 +89,15 @@ GET    /api/users               - List users (admin only)
 ### Backend (.env)
 ```
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/findit
-JWT_SECRET=your_secret_key
+MONGO_URI=mongodb+srv://<db-user>:<db-password>@<cluster-host>/<db-name>?retryWrites=true&w=majority
+JWT_SECRET=<random-secret-at-least-32-characters>
 CLOUDINARY_CLOUD_NAME=your_name
 CLOUDINARY_API_KEY=your_key
 CLOUDINARY_API_SECRET=your_secret
 CLIENT_URL=http://localhost:5173
 ```
+Keep `server/.env` private. Cloudinary values are optional unless you use image
+uploads. Local MongoDB is not used.
 
 ### Frontend (.env.development)
 ```
@@ -136,7 +126,7 @@ VITE_API_URL=http://localhost:5000/api
 - [ ] `npm run dev` starts both servers
 - [ ] Frontend loads at `http://localhost:5173`
 - [ ] Backend health check: `http://localhost:5000/api/health`
-- [ ] Can login with demo account
+- [ ] Can login with an existing Atlas account
 - [ ] Dashboard shows after login
 - [ ] Search works
 - [ ] Can bookmark items

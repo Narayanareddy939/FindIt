@@ -43,10 +43,15 @@ const allowedOrigins = [
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('CORS not allowed'));
+      return callback(null, true);
     }
+    try {
+      const { hostname } = new URL(origin);
+      if (hostname === 'localhost' || hostname.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+    } catch {}
+    callback(new Error('CORS not allowed'));
   },
   credentials: true,
 }));
@@ -298,29 +303,32 @@ await user.save({ validateBeforeSave: false });
 /* ─── Database + Server ──────────────────────────────────────────────────── */
 const startServer = async () => {
   try {
-    if (process.env.NODE_ENV === 'production' && !process.env.MONGO_URI) {
-      throw new Error('MONGO_URI must be configured in production');
+    const mongoUri = process.env.MONGO_URI;
+    if (!mongoUri) {
+      throw new Error('MONGO_URI is missing or empty in server/.env. From server/, run .\\setup-local-env.ps1 and enter the rotated Atlas password when prompted.');
     }
 
-    let mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/findit';
-    let memoryServer = null;
-
+    let isAtlas = false;
     try {
-      await mongoose.connect(mongoUri, {
-        serverSelectionTimeoutMS: 2000,
-      });
-      console.log('✅ MongoDB connected');
-    } catch (connectErr) {
-      if (process.env.NODE_ENV !== 'production' && (!process.env.MONGO_URI || /localhost|127\.0\.0\.1/.test(mongoUri))) {
-        const { MongoMemoryServer } = require('mongodb-memory-server');
-        memoryServer = await MongoMemoryServer.create();
-        mongoUri = memoryServer.getUri();
-        await mongoose.connect(mongoUri);
-        console.log('✅ MongoDB connected via in-memory fallback');
-      } else {
-        throw connectErr;
-      }
+      const parsed = new URL(mongoUri);
+      isAtlas = !['localhost', '127.0.0.1', '::1'].includes(parsed.hostname);
+    } catch {
+      isAtlas = (mongoUri.startsWith('mongodb://') || mongoUri.startsWith('mongodb+srv://')) &&
+        mongoUri.includes('mongodb.net') &&
+        !mongoUri.includes('localhost') &&
+        !mongoUri.includes('127.0.0.1');
     }
+
+    if (!isAtlas) {
+      throw new Error('MONGO_URI must point to MongoDB Atlas; local MongoDB connections are disabled');
+    }
+
+    if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+      throw new Error('JWT_SECRET must be at least 32 characters. Run .\\setup-local-env.ps1 to generate it.');
+    }
+
+    await mongoose.connect(mongoUri, { serverSelectionTimeoutMS: 10000 });
+    console.log('✅ MongoDB connected');
 
     let portToUse = DEFAULT_PORT;
     let server = null;
@@ -347,9 +355,6 @@ const startServer = async () => {
 
     const shutdown = async () => {
       await mongoose.disconnect();
-      if (memoryServer) {
-        await memoryServer.stop();
-      }
       process.exit(0);
     };
 

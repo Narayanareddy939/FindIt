@@ -1,14 +1,13 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search as SearchIcon, SlidersHorizontal, X, ChevronDown, Grid3x3,
-  List, ArrowUpDown, Package,
+  Search as SearchIcon, SlidersHorizontal, X, Grid3x3, List, Package,
 } from 'lucide-react';
 import PageWrapper from '../../components/common/PageWrapper';
 import ItemCard from '../../components/cards/ItemCard';
 import { useApp } from '../../context/AppContext';
-import { CATEGORIES, CAMPUS_LOCATIONS } from '../../data/mockData';
+import { CATEGORIES } from '../../data/mockData';
 import { debounce } from '../../utils/helpers';
 
 const SORT_OPTIONS = [

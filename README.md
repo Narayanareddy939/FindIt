@@ -12,16 +12,17 @@ A **production-ready**, full-stack web application for Presidency University stu
 
 ### 5-Minute Local Setup
 ```bash
-# Clone and setup (installs dependencies + seeds demo data)
-npm run setup
+# Install dependencies only; no database seed runs automatically
+npm run install:all
 
 # Start both servers
 npm run dev
 ```
 
-Open **[http://localhost:5173](http://localhost:5173)** and login with demo account:
-- **Email:** `student@presidencyuniversity.in`
-- **Password:** `Student@123`
+Configure `server/.env` with your existing MongoDB Atlas URI and a private JWT
+secret before starting the backend. See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
+for the exact local setup steps. Register with a permitted university email or
+sign in with an existing account.
 
 📖 **Full setup guide:** See [SETUP_INSTRUCTIONS.md](SETUP_INSTRUCTIONS.md)
 
@@ -111,18 +112,6 @@ FindIt/
 
 ---
 
-## 🔐 Demo Accounts
-
-### Admin Account
-- **Email:** `admin@findit.local`
-- **Password:** `Admin@123`
-- **Access:** Admin dashboard, user management
-
-### Student Account  
-- **Email:** `student@presidencyuniversity.in`
-- **Password:** `Student@123`
-- **Access:** Full student features
-
 ---
 
 ## 📖 Documentation
@@ -146,9 +135,11 @@ npm run dev:server      # Start Express dev server only
 # Production
 npm run build           # Build React for production
 
-# Database
-npm run seed            # Seed demo accounts and items
-npm run setup           # Full setup: install deps + seed
+# Setup (installs dependencies only; does not seed the database)
+npm run setup
+
+# Guarded seed utility; do not run against an existing Atlas database
+npm run seed
 
 # One-time
 npm run install:all     # Install all dependencies

@@ -112,7 +112,7 @@ export default function ItemDetails() {
       }
       toast.success('🎉 Item marked as returned!');
     } catch (err) {
-      toast.error('Unable to update item status. Please try again later.');
+      toast.error(err.message || 'Unable to update item status. Please try again later.');
     } finally {
       setMarkingReturned(false);
     }
