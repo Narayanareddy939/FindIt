@@ -16,7 +16,7 @@ const STEPS = ['Item Details', 'Location & Date', 'Your Info', 'Review & Submit'
 
 export default function ReportFound() {
   const navigate = useNavigate();
-  const { addItem } = useApp();
+  const { addItem, uploadImages } = useApp();
 
   const [step, setStep]   = useState(0);
   const [loading, setLoading] = useState(false);
@@ -87,11 +87,25 @@ export default function ReportFound() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 1500));
+      let uploadedUrls = [];
+      const filesToUpload = images.filter((img) => img.file).map((img) => img.file);
+      if (filesToUpload.length > 0) {
+        try {
+          const fd = new FormData();
+          filesToUpload.forEach((file) => fd.append('images', file));
+          const uploaded = await uploadImages(fd);
+          if (Array.isArray(uploaded)) {
+            uploadedUrls = uploaded.map((u) => u.url || u.path || u).filter(Boolean);
+          }
+        } catch (uploadErr) {
+          console.warn('Image upload failed, continuing without images:', uploadErr);
+        }
+      }
+
       const item = await addItem({
         ...form,
         type: 'found',
-        images: images.map((i) => i.preview),
+        images: uploadedUrls,
       });
       toast.success('Found item reported! 🟢 The owner will be notified.');
       navigate(`/item/${item.id || item._id}`);

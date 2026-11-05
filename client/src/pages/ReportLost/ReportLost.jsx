@@ -17,7 +17,7 @@ const STEPS = ['Item Details', 'Location & Date', 'Contact & Reward', 'Review & 
 
 export default function ReportLost() {
   const navigate = useNavigate();
-  const { items, addItem } = useApp();
+  const { items, addItem, uploadImages } = useApp();
 
   const [step, setStep]     = useState(0);
   const [loading, setLoading] = useState(false);
@@ -120,11 +120,25 @@ export default function ReportLost() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await new Promise((r) => setTimeout(r, 1500));
+      let uploadedUrls = [];
+      const filesToUpload = images.filter((img) => img.file).map((img) => img.file);
+      if (filesToUpload.length > 0) {
+        try {
+          const fd = new FormData();
+          filesToUpload.forEach((file) => fd.append('images', file));
+          const uploaded = await uploadImages(fd);
+          if (Array.isArray(uploaded)) {
+            uploadedUrls = uploaded.map((u) => u.url || u.path || u).filter(Boolean);
+          }
+        } catch (uploadErr) {
+          console.warn('Image upload failed, continuing without images:', uploadErr);
+        }
+      }
+
       const item = await addItem({
         ...form,
         type: 'lost',
-        images: images.map((i) => i.preview),
+        images: uploadedUrls,
         reward: form.reward || null,
       });
       toast.success('Lost item reported! 🔴 We\'ll notify you of matches.');
